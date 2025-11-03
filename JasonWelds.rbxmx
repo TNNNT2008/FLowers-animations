@@ -45,7 +45,7 @@
 				</CoordinateFrame>
 				<bool name="Enabled">true</bool>
 				<Ref name="Part0">null</Ref>
-				<Ref name="Part1">RBX82D5A10E2C8E49DC8DE965B318150E15</Ref>
+				<Ref name="Part1">RBX99409FC3E9D646ED9FA28899FBF261A9</Ref>
 				<BinaryString name="AttributesSerialize"></BinaryString>
 				<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
 				<bool name="DefinesCapabilities">false</bool>
@@ -88,7 +88,7 @@
 				</CoordinateFrame>
 				<bool name="Enabled">true</bool>
 				<Ref name="Part0">null</Ref>
-				<Ref name="Part1">RBXDB8BCB80509B44B79A0421FA07250E6A</Ref>
+				<Ref name="Part1">RBX8508DDE53D5C4EA483A76321A2CEC0E0</Ref>
 				<BinaryString name="AttributesSerialize"></BinaryString>
 				<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
 				<bool name="DefinesCapabilities">false</bool>
@@ -97,10 +97,10 @@
 				<BinaryString name="Tags"></BinaryString>
 			</Properties>
 		</Item>
-		<Item class="Part" referent="RBXDB8BCB80509B44B79A0421FA07250E6A">
+		<Item class="Part" referent="RBX8508DDE53D5C4EA483A76321A2CEC0E0">
 			<Properties>
 				<token name="shape">1</token>
-				<token name="formFactorRaw">3</token>
+				<token name="formFactorRaw">1</token>
 				<bool name="Anchored">false</bool>
 				<bool name="AudioCanCollide">true</bool>
 				<float name="BackParamA">-0.5</float>
@@ -112,30 +112,30 @@
 				<token name="BottomSurface">0</token>
 				<token name="BottomSurfaceInput">0</token>
 				<CoordinateFrame name="CFrame">
-					<X>85.9000015</X>
-					<Y>7.31500006</Y>
-					<Z>-0.759996414</Z>
-					<R00>-1</R00>
+					<X>86</X>
+					<Y>6</Y>
+					<Z>-0.499999523</Z>
+					<R00>1</R00>
 					<R01>0</R01>
 					<R02>0</R02>
 					<R10>0</R10>
-					<R11>0</R11>
-					<R12>-1</R12>
+					<R11>1</R11>
+					<R12>0</R12>
 					<R20>0</R20>
-					<R21>-1</R21>
-					<R22>0</R22>
+					<R21>0</R21>
+					<R22>1</R22>
 				</CoordinateFrame>
-				<bool name="CanCollide">false</bool>
+				<bool name="CanCollide">true</bool>
 				<bool name="CanQuery">true</bool>
-				<bool name="CanTouch">false</bool>
+				<bool name="CanTouch">true</bool>
 				<bool name="CastShadow">true</bool>
-				<string name="CollisionGroup">None</string>
-				<int name="CollisionGroupId">-1</int>
-				<Color3uint8 name="Color3uint8">4284702562</Color3uint8>
+				<string name="CollisionGroup">Default</string>
+				<int name="CollisionGroupId">0</int>
+				<Color3uint8 name="Color3uint8">4288914085</Color3uint8>
 				<PhysicalProperties name="CustomPhysicalProperties">
 					<CustomPhysics>false</CustomPhysics>
 				</PhysicalProperties>
-				<bool name="EnableFluidForces">false</bool>
+				<bool name="EnableFluidForces">true</bool>
 				<float name="FrontParamA">-0.5</float>
 				<float name="FrontParamB">0.5</float>
 				<token name="FrontSurface">0</token>
@@ -145,8 +145,8 @@
 				<token name="LeftSurface">0</token>
 				<token name="LeftSurfaceInput">0</token>
 				<bool name="Locked">false</bool>
-				<bool name="Massless">true</bool>
-				<token name="Material">1040</token>
+				<bool name="Massless">false</bool>
+				<token name="Material">256</token>
 				<string name="MaterialVariantSerialized"></string>
 				<CoordinateFrame name="PivotOffset">
 					<X>0</X>
@@ -184,9 +184,9 @@
 					<Z>0</Z>
 				</Vector3>
 				<Vector3 name="size">
-					<X>0.200000003</X>
-					<Y>3.9199934</Y>
-					<Z>0.829999506</Z>
+					<X>4</X>
+					<Y>1</Y>
+					<Z>2</Z>
 				</Vector3>
 				<BinaryString name="AttributesSerialize"></BinaryString>
 				<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
@@ -195,20 +195,20 @@
 				<int64 name="SourceAssetId">-1</int64>
 				<BinaryString name="Tags"></BinaryString>
 			</Properties>
-			<Item class="SpecialMesh" referent="RBXB603BCC6982844B38E269015AF15C49C">
+			<Item class="SpecialMesh" referent="RBX6B9347A96001498D8B525C22806EAF84">
 				<Properties>
 					<token name="MeshType">5</token>
-					<Content name="MeshId"><url>rbxassetid://441575918</url></Content>
-					<Content name="TextureId"><url>rbxassetid://441575955</url></Content>
+					<Content name="MeshId"><url>rbxassetid://96653589552382</url></Content>
+					<Content name="TextureId"><null></null></Content>
 					<Vector3 name="Offset">
 						<X>0</X>
 						<Y>0</Y>
 						<Z>0</Z>
 					</Vector3>
 					<Vector3 name="Scale">
-						<X>0.0160000008</X>
-						<Y>0.0160000008</Y>
-						<Z>0.0160000008</Z>
+						<X>1</X>
+						<Y>1</Y>
+						<Z>1</Z>
 					</Vector3>
 					<Vector3 name="VertexColor">
 						<X>1</X>
@@ -224,10 +224,10 @@
 				</Properties>
 			</Item>
 		</Item>
-		<Item class="Part" referent="RBX82D5A10E2C8E49DC8DE965B318150E15">
+		<Item class="Part" referent="RBX99409FC3E9D646ED9FA28899FBF261A9">
 			<Properties>
 				<token name="shape">1</token>
-				<token name="formFactorRaw">2</token>
+				<token name="formFactorRaw">1</token>
 				<bool name="Anchored">false</bool>
 				<bool name="AudioCanCollide">true</bool>
 				<float name="BackParamA">-0.5</float>
@@ -239,9 +239,9 @@
 				<token name="BottomSurface">0</token>
 				<token name="BottomSurfaceInput">0</token>
 				<CoordinateFrame name="CFrame">
-					<X>85.8000031</X>
-					<Y>6.54400015</Y>
-					<Z>-0.739993453</Z>
+					<X>86</X>
+					<Y>7.99933815</Y>
+					<Z>-0.499999523</Z>
 					<R00>1</R00>
 					<R01>0</R01>
 					<R02>0</R02>
@@ -252,17 +252,17 @@
 					<R21>0</R21>
 					<R22>1</R22>
 				</CoordinateFrame>
-				<bool name="CanCollide">false</bool>
+				<bool name="CanCollide">true</bool>
 				<bool name="CanQuery">true</bool>
-				<bool name="CanTouch">false</bool>
+				<bool name="CanTouch">true</bool>
 				<bool name="CastShadow">true</bool>
-				<string name="CollisionGroup">None</string>
-				<int name="CollisionGroupId">-1</int>
-				<Color3uint8 name="Color3uint8">4291045404</Color3uint8>
+				<string name="CollisionGroup">Default</string>
+				<int name="CollisionGroupId">0</int>
+				<Color3uint8 name="Color3uint8">4288914085</Color3uint8>
 				<PhysicalProperties name="CustomPhysicalProperties">
 					<CustomPhysics>false</CustomPhysics>
 				</PhysicalProperties>
-				<bool name="EnableFluidForces">false</bool>
+				<bool name="EnableFluidForces">true</bool>
 				<float name="FrontParamA">-0.5</float>
 				<float name="FrontParamB">0.5</float>
 				<token name="FrontSurface">0</token>
@@ -272,7 +272,7 @@
 				<token name="LeftSurface">0</token>
 				<token name="LeftSurfaceInput">0</token>
 				<bool name="Locked">false</bool>
-				<bool name="Massless">true</bool>
+				<bool name="Massless">false</bool>
 				<token name="Material">256</token>
 				<string name="MaterialVariantSerialized"></string>
 				<CoordinateFrame name="PivotOffset">
@@ -289,7 +289,7 @@
 					<R21>0</R21>
 					<R22>1</R22>
 				</CoordinateFrame>
-				<float name="Reflectance">0.400000006</float>
+				<float name="Reflectance">0</float>
 				<float name="RightParamA">-0.5</float>
 				<float name="RightParamB">0.5</float>
 				<token name="RightSurface">0</token>
@@ -311,31 +311,31 @@
 					<Z>0</Z>
 				</Vector3>
 				<Vector3 name="size">
-					<X>0.889999986</X>
-					<Y>0.712000012</Y>
-					<Z>3.55999994</Z>
+					<X>0.00100000005</X>
+					<Y>0.00100000005</Y>
+					<Z>0.00100000005</Z>
 				</Vector3>
 				<BinaryString name="AttributesSerialize"></BinaryString>
 				<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
 				<bool name="DefinesCapabilities">false</bool>
 				<string name="Name">Chainsaw</string>
-				<int64 name="SourceAssetId">2919881170</int64>
+				<int64 name="SourceAssetId">-1</int64>
 				<BinaryString name="Tags"></BinaryString>
 			</Properties>
-			<Item class="SpecialMesh" referent="RBX2978C812AE4E475A9B75BB5D79A3629E">
+			<Item class="SpecialMesh" referent="RBX76D1F399D67949448B4C5FA32ED611B0">
 				<Properties>
 					<token name="MeshType">5</token>
-					<Content name="MeshId"><url>http://www.roblox.com/asset/?id=2766469</url></Content>
-					<Content name="TextureId"><url>rbxasset://textures/SwordTexture.png</url></Content>
+					<Content name="MeshId"><url>rbxassetid://96653589552382</url></Content>
+					<Content name="TextureId"><null></null></Content>
 					<Vector3 name="Offset">
 						<X>0</X>
 						<Y>0</Y>
 						<Z>0</Z>
 					</Vector3>
 					<Vector3 name="Scale">
-						<X>0.889999986</X>
-						<Y>0.889999986</Y>
-						<Z>1.15699995</Z>
+						<X>1</X>
+						<Y>0.999450684</Y>
+						<Z>1</Z>
 					</Vector3>
 					<Vector3 name="VertexColor">
 						<X>1</X>
