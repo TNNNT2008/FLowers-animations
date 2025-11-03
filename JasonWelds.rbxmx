@@ -11,6 +11,92 @@
 			<int64 name="SourceAssetId">-1</int64>
 			<BinaryString name="Tags"></BinaryString>
 		</Properties>
+		<Item class="Motor6D" referent="RBX0878972A793F40BB9F5AD5A75FC182A5">
+			<Properties>
+				<float name="DesiredAngle">0</float>
+				<float name="MaxVelocity">0</float>
+				<CoordinateFrame name="C0">
+					<X>0</X>
+					<Y>0</Y>
+					<Z>0</Z>
+					<R00>1</R00>
+					<R01>0</R01>
+					<R02>0</R02>
+					<R10>0</R10>
+					<R11>1</R11>
+					<R12>0</R12>
+					<R20>0</R20>
+					<R21>0</R21>
+					<R22>1</R22>
+				</CoordinateFrame>
+				<CoordinateFrame name="C1">
+					<X>0</X>
+					<Y>0</Y>
+					<Z>0</Z>
+					<R00>1</R00>
+					<R01>0</R01>
+					<R02>0</R02>
+					<R10>0</R10>
+					<R11>1</R11>
+					<R12>0</R12>
+					<R20>0</R20>
+					<R21>0</R21>
+					<R22>1</R22>
+				</CoordinateFrame>
+				<bool name="Enabled">true</bool>
+				<Ref name="Part0">null</Ref>
+				<Ref name="Part1">RBX82D5A10E2C8E49DC8DE965B318150E15</Ref>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
+				<bool name="DefinesCapabilities">false</bool>
+				<string name="Name">ChainsawMotor</string>
+				<int64 name="SourceAssetId">-1</int64>
+				<BinaryString name="Tags"></BinaryString>
+			</Properties>
+		</Item>
+		<Item class="Motor6D" referent="RBX65D1BB50501D421F8BF02A4CEA62713A">
+			<Properties>
+				<float name="DesiredAngle">0</float>
+				<float name="MaxVelocity">0</float>
+				<CoordinateFrame name="C0">
+					<X>0</X>
+					<Y>0</Y>
+					<Z>0</Z>
+					<R00>-1</R00>
+					<R01>0</R01>
+					<R02>-0</R02>
+					<R10>0</R10>
+					<R11>0</R11>
+					<R12>-1</R12>
+					<R20>0</R20>
+					<R21>-1</R21>
+					<R22>-0</R22>
+				</CoordinateFrame>
+				<CoordinateFrame name="C1">
+					<X>0</X>
+					<Y>0</Y>
+					<Z>0</Z>
+					<R00>1</R00>
+					<R01>0</R01>
+					<R02>0</R02>
+					<R10>0</R10>
+					<R11>1</R11>
+					<R12>0</R12>
+					<R20>0</R20>
+					<R21>0</R21>
+					<R22>1</R22>
+				</CoordinateFrame>
+				<bool name="Enabled">true</bool>
+				<Ref name="Part0">null</Ref>
+				<Ref name="Part1">RBXDB8BCB80509B44B79A0421FA07250E6A</Ref>
+				<BinaryString name="AttributesSerialize"></BinaryString>
+				<SecurityCapabilities name="Capabilities">0</SecurityCapabilities>
+				<bool name="DefinesCapabilities">false</bool>
+				<string name="Name">MacheteMotor</string>
+				<int64 name="SourceAssetId">-1</int64>
+				<BinaryString name="Tags"></BinaryString>
+			</Properties>
+		</Item>
 		<Item class="Part" referent="RBXDB8BCB80509B44B79A0421FA07250E6A">
 			<Properties>
 				<token name="shape">1</token>
