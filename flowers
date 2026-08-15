@@ -1,0 +1,1181 @@
+
+
+
+local localPlayer = game.Players.LocalPlayer
+local char2 = localPlayer.Character or localPlayer.CharacterAdded:Wait()
+
+local newchar = game.ReplicatedStorage:WaitForChild("Rig2"):Clone()
+newchar.Parent = workspace
+newchar.Name = localPlayer.Name
+task.wait(0.1)
+local oldpose = char2:GetPivot()
+
+
+
+
+-- 1. Находим инструмент F3X
+local f3xTool = localPlayer:WaitForChild("Building Tools", 2) 
+	or localPlayer.Backpack:WaitForChild("Building Tools", 2)
+
+if not f3xTool then
+	local f3xTool = localPlayer:WaitForChild("Building Tools", 2) 
+		or localPlayer.Backpack:WaitForChild("Building Tools", 2)
+end
+
+task.wait(0.2)
+
+local SyncAPI = f3xTool:WaitForChild("SyncAPI", 2)
+
+
+
+local spawnCFrame = CFrame.new(0, -10, 0)
+
+local headmesh = {
+	
+		Vector3.new(1, 2.5, 1.5)
+	
+	
+}
+
+local testlimb = {}
+
+local limbConfig = {
+	{ Name = "Head",      Offset = Vector3.new(0, 1.5, 0) },
+	{ Name = "Torso",     Offset = Vector3.new(0, 0, 0) },
+	{ Name = "LeftArm",   Offset = Vector3.new(-1.5, 0, 0) },
+	{ Name = "RightArm",  Offset = Vector3.new(1.5, 0, 0) },
+	{ Name = "LeftLeg",   Offset = Vector3.new(-0.5, -2, 0) },
+	{ Name = "RightLeg",  Offset = Vector3.new(0.5, -2, 0) },
+	{ Name = "LowerRightLeg", Offset = Vector3.new(0.5, -2, 0) },
+	{ Name = "LowerLeftLeg", Offset = Vector3.new(-0.5, -2, 0) },
+	{ Name = "LeftLowerArm", Offset = Vector3.new(-1.5, 0, 0) },
+	{ Name = "RightLowerArm", Offset = Vector3.new(1.5, 0, 0) }
+}
+local r6names = {"Head", "Torso", "LeftArm", "RightArm", "LeftLeg", "RightLeg"}
+local r6trunames = {"Head", "Torso", "Left Arm", "Right Arm", "Left Leg", "Right Leg"}
+local limbSize = {
+	Head = Vector3.new(2, 1, 1),
+	Torso = Vector3.new(2, 3.1, 1),
+	LeftArm = Vector3.new(1, 4.2, 1),
+	RightArm = Vector3.new(1, 4.2, 1),
+	LeftLeg = Vector3.new(1, 3.5, 1),
+	RightLeg = Vector3.new(1, 3.5, 1),
+	LowerRightLeg = Vector3.new(1, 3.4, 1),
+	LowerLeftLeg = Vector3.new(1, 3.4, 1),
+	LeftLowerArm = Vector3.new(1, 4.2, 1),
+	RightLowerArm = Vector3.new(1, 4.2, 1),
+}
+
+
+local createdLimbs = {} 
+local limbNames = {}   
+local resizeChangesTable = {}
+local collide = {}
+
+for _, limb in ipairs(limbConfig) do
+	local targetPosition = spawnCFrame * CFrame.new(limb.Offset)
+
+
+	local newPart = SyncAPI:Invoke("CreatePart", "Normal", targetPosition, workspace)
+
+	if newPart and newPart:IsA("BasePart") then
+		local correctSize = limbSize[limb.Name]
+
+
+
+		table.insert(collide, {
+			Part = newPart,
+			CanCollide = false
+		}
+
+		)
+		table.insert(resizeChangesTable, {
+			Part = newPart,
+			Size = correctSize,
+			CFrame = newPart.CFrame}
+		)
+		table.insert(createdLimbs, newPart)
+		table.insert(limbNames, limb.Name) 
+	else
+		warn("Не удалось создать часть тела: " .. limb.Name)
+	end
+end
+
+
+if #createdLimbs == #limbConfig then
+
+
+
+	SyncAPI:Invoke("SyncResize", resizeChangesTable)
+	SyncAPI:Invoke("SyncCollision", collide)
+	SyncAPI:Invoke("SetName", createdLimbs, limbNames)
+
+	print("Группируем детали в модель персонажа...")
+
+	local createTextureTable = {
+		{
+			Part = createdLimbs[1],
+			TextureType = "Decal",
+			Face = Enum.NormalId.Front
+		}
+	}
+	SyncAPI:Invoke("CreateTextures", createTextureTable)
+	local textureChangesTable = {
+		{
+			Part = createdLimbs[1],                
+			TextureType = "Decal",                 
+			Face = Enum.NormalId.Front,                
+			Texture = "rbxassetid://39022809",   
+			Transparency = 0                       
+		}
+	}
+
+
+	SyncAPI:Invoke("SyncTexture", textureChangesTable)
+
+
+
+
+
+
+
+
+
+	local characterModel = SyncAPI:Invoke("CreateGroup", "Model", workspace, createdLimbs)
+
+	if characterModel then
+
+		SyncAPI:Invoke("SetName", {characterModel}, "F3X_Character")
+		
+		SyncAPI:Invoke("SetLocked", createdLimbs, true)
+		
+		print("Персонаж полностью готов и отсортирован в Explorer!")
+	else
+		warn("Не удалось сгруппировать персонажа в модель.")
+	end
+
+
+
+else
+	warn("Ошибка: Создано только " .. #createdLimbs .. " частей из 6.")
+end
+
+local createheadmesh = {
+	{
+	Part = createdLimbs[1]
+	}
+}
+SyncAPI:Invoke("CreateMeshes", createheadmesh)
+local syncheadmesh = {
+	{
+	Part = createdLimbs[1],
+	MeshType = "Head",
+	Scale = headmesh[1],
+	}
+}
+
+SyncAPI:Invoke("SyncMesh", syncheadmesh)
+
+local char = localPlayer.Character
+
+local myLimbs2 = {}
+local needs = char:GetChildren()
+for _, b in ipairs(needs) do
+	if b:IsA("BasePart") or b:IsA("MeshPart") then
+		table.insert(myLimbs2, b)
+	end
+end
+local face = char.Head:FindFirstChild("face")
+if face then
+	local facet =  {face}
+	SyncAPI:invoke("Remove" , facet)
+end
+local transp = {}
+for _, b in ipairs(myLimbs2) do
+	table.insert(transp, {
+		Part = b,
+		Transparency = 1
+	})
+end
+
+SyncAPI:Invoke("SyncMaterial", transp)
+
+
+
+newchar:PivotTo(oldpose + Vector3.new(0, 5, 0))
+localPlayer.Character = newchar
+task.wait(0.05)
+local char = localPlayer.Character
+local leftLeg  = char:WaitForChild("Left Leg")
+local RightLeg = char:WaitForChild("Right Leg")
+local leftArm  = char:WaitForChild("Left Arm")
+local RightArm = char:WaitForChild("Right Arm")
+local Torso    = char:WaitForChild("Torso")
+local Head     = char:WaitForChild("Head")
+local lowerrightleg = char:WaitForChild("RightLowerLeg")
+local lowerleftleg = char:WaitForChild("LeftLowerLeg")
+local lowerleftarm = char:WaitForChild("LeftLowerArm")
+local lowerrightarm = char:WaitForChild("RightLowerArm")
+local myLimbs = {Head, Torso, leftArm, RightArm, leftLeg, RightLeg, lowerrightleg, lowerleftleg, lowerleftarm, lowerrightarm} 
+local camera = workspace.Camera
+camera.CameraSubject = char:WaitForChild("Humanoid")
+task.wait(0.1)
+
+
+local f3xLimbs = createdLimbs
+local mainChangesTable = {}
+
+
+local moveChangesTable = {}
+
+local RunService = game:GetService("RunService")
+
+
+-- то нужноа
+
+local npclimbandnpc = {}
+
+local folder = Instance.new("Folder")
+folder.Name = "FakeChars"
+folder.Parent = workspace
+local fakechars = {}
+
+local function SpawnDecoy(pos)
+	local fakelimbs = {}
+	local fakechar = game.ReplicatedStorage.r6Rig:Clone()
+	fakechar.Parent = folder
+	fakechar.HumanoidRootPart.CFrame = (pos * CFrame.new(0, 0, -2.2))
+	local sizeconfigR6 = {
+		Head = Vector3.new(2, 1, 1),
+		Torso = Vector3.new(2, 2, 1),
+		LeftArm = Vector3.new(1, 2, 1),
+		RightArm = Vector3.new(1, 2, 1),
+		LeftLeg = Vector3.new(1, 2, 1),
+		RightLeg = Vector3.new(1, 2, 1)
+	}
+	local r6colors = {
+		Head = Color3.fromRGB(255, 255, 0),
+		Torso = Color3.fromRGB(19, 0, 225),
+		LeftArm = Color3.fromRGB(255, 255, 0),
+		RightArm = Color3.fromRGB(255, 255, 0),
+		LeftLeg = Color3.fromRGB(212, 214, 77),
+		RightLeg = Color3.fromRGB(212, 214, 77)
+	}
+	
+	local npcObject = {
+		Instance = fakechar,         
+		Bones = nil,
+		LastUpdate = 0
+	}
+	
+	local size = {}
+	local colors = {}
+	
+	for i, limb in ipairs(r6names) do
+		local newPart = SyncAPI:Invoke('CreatePart', "Normal", workspace.SpawnLocation.CFrame, workspace)
+		table.insert(fakelimbs, newPart)
+		table.insert(size, {
+			Part = newPart,
+			Size = sizeconfigR6[r6names[i]],
+			CFrame = newPart.CFrame}
+		)
+		SyncAPI:Invoke("SetName", {newPart}, r6names[i])
+		table.insert(colors, {
+			Part = newPart,
+			Color = r6colors[r6names[i]]
+		})
+	end
+	task.wait(0.01)
+	SyncAPI:Invoke("SyncResize", size)
+	local group = SyncAPI:Invoke("CreateGroup", "Model", workspace, fakelimbs)
+	SyncAPI:Invoke("SetName", {group}, "he")
+	SyncAPI:Invoke("SetLocked", fakelimbs, true)
+
+
+SyncAPI:Invoke("SyncColor", colors)
+local changes = {}
+for _, part in pairs(fakelimbs) do
+	table.insert(changes, {
+		Part = part,
+		CanCollide = false,
+	})
+end
+	
+SyncAPI:Invoke("SyncCollision", changes)
+local table1 = {
+	{
+			Part = fakelimbs[1]
+	}
+}
+local table2 = {
+	{
+			Part = fakelimbs[1],
+		MeshType = Enum.MeshType.Head,
+		Scale = Vector3.new(1.2, 1.24, 1.25)
+	}
+}
+SyncAPI:Invoke("CreateMeshes", table1)
+SyncAPI:Invoke("SyncMesh", table2)
+SyncAPI:Invoke("CreateTextures", {
+		{Part = fakelimbs[1],
+		TextureType = "Decal",
+		Face = Enum.NormalId.Front
+	}
+})
+SyncAPI:Invoke("SyncTexture", {
+		{Part = fakelimbs[1],
+		TextureType = "Decal",
+		Face = Enum.NormalId.Front,
+		Texture = "rbxassetid://8005336366"}
+})
+	npclimbandnpc[fakechar] = npcObject
+
+	npcObject.Bones = {
+		["Torso"] = fakelimbs[2], ["Head"] = fakelimbs[1], 
+		["Right Arm"] = fakelimbs[4], ["Left Arm"] = fakelimbs[3], 
+		["Right Leg"] = fakelimbs[6], ["Left Leg"] = fakelimbs[5]
+	}
+end
+
+local fakecreatedlimb = {}
+local function SpawnFakeChar(Rig, plr)
+	fakecreatedlimb = {}
+	local sizeconfigR6 = {
+		Head = Vector3.new(2, 1, 1),
+		Torso = Vector3.new(2, 2, 1),
+		LeftArm = Vector3.new(1, 2, 1),
+		RightArm = Vector3.new(1, 2, 1),
+		LeftLeg = Vector3.new(1, 2, 1),
+		RightLeg = Vector3.new(1, 2, 1)
+	}
+	local r6colors = {
+		Head = Color3.fromRGB(255, 255, 0),
+		Torso = Color3.fromRGB(19, 0, 225),
+		LeftArm = Color3.fromRGB(255, 255, 0),
+		RightArm = Color3.fromRGB(255, 255, 0),
+		LeftLeg = Color3.fromRGB(212, 214, 77),
+		RightLeg = Color3.fromRGB(212, 214, 77)
+	}
+	wait(0.05)
+	
+	local size = {}
+	local colors = {}
+	
+	if Rig == "R6" then
+		for i, limb in ipairs(r6names) do
+			local newPart = SyncAPI:Invoke('CreatePart', "Normal", workspace.SpawnLocation.CFrame, workspace)
+			table.insert(fakecreatedlimb, newPart)
+			table.insert(size, {
+				Part = newPart,
+				Size = sizeconfigR6[r6names[i]],
+				CFrame = newPart.CFrame}
+			)
+			SyncAPI:Invoke("SetName", {newPart}, r6names[i])
+			table.insert(colors, {
+				Part = newPart,
+				Color = r6colors[r6names[i]]
+			})
+		end
+		task.wait(0.01)
+		SyncAPI:Invoke("SyncResize", size)
+		local group = SyncAPI:Invoke("CreateGroup", "Model", workspace, fakecreatedlimb)
+		SyncAPI:Invoke("SetName", {group}, "he")
+		SyncAPI:Invoke("SetLocked", fakecreatedlimb, true)
+		
+	end
+	SyncAPI:Invoke("SyncColor", colors)
+	local changes = {}
+	for _, part in pairs(fakecreatedlimb) do
+		table.insert(changes, {
+			Part = part,
+			CanCollide = false,
+		})
+	end
+	print(fakecreatedlimb)
+	SyncAPI:Invoke("SyncCollision", changes)
+	local table1 = {
+		{
+		Part = fakecreatedlimb[1]
+		}
+	}
+	local table2 = {
+		{
+		Part = fakecreatedlimb[1],
+		MeshType = Enum.MeshType.Head,
+		Scale = Vector3.new(1.2, 1.24, 1.25)
+		}
+	}
+	SyncAPI:Invoke("CreateMeshes", table1)
+	SyncAPI:Invoke("SyncMesh", table2)
+	SyncAPI:Invoke("CreateTextures", {
+		{Part =fakecreatedlimb[1],
+		TextureType = "Decal",
+		Face = Enum.NormalId.Front
+		}
+	})
+	SyncAPI:Invoke("SyncTexture", {
+		{Part = fakecreatedlimb[1],
+		TextureType = "Decal",
+		Face = Enum.NormalId.Front,
+			Texture = "rbxassetid://8005314591"}
+    })
+end
+
+
+
+local Services = {
+	TweenService = game:GetService("TweenService"),
+	RunService = game:GetService("RunService"),
+	Players = game:GetService("Players")
+}
+
+local AnimatorCache = { Joints = {}, AnimDefaults = {}, JointTypes = {}, Rigs = {} }
+local ScriptSettings = { Options = { AnimationSpeed = 1, AnimationBlending = 0.25 } }
+local ActiveTweens = {}
+
+-- Функция регистрации суставов (работает для ЛЮБОЙ модели: игрока или NPC)
+local function RegisterRigJoints(Rig: Model)
+	if AnimatorCache.Joints[Rig] then return end -- Уже зарегистрирован, пропускаем
+
+	AnimatorCache.Joints[Rig] = {}
+	AnimatorCache.AnimDefaults[Rig] = {}
+	AnimatorCache.JointTypes[Rig] = {}
+
+	-- Удаляем стандартный Animator на клиенте, чтобы он не блокировал наши CFrame
+	local humanoid = Rig:FindFirstChildOfClass("Humanoid")
+	if humanoid then
+		local animator = humanoid:FindFirstChildOfClass("Animator")
+		if animator then animator:Destroy() end
+	end
+
+	for i, v in ipairs(Rig:GetDescendants()) do
+		if v:IsA("Bone") then
+			AnimatorCache.Joints[Rig][v.Name] = v
+			AnimatorCache.AnimDefaults[Rig][v.Name] = v.CFrame
+			AnimatorCache.JointTypes[Rig][v.Name] = "Bone"
+		elseif v:IsA("Motor6D") and v.Part1 then
+			AnimatorCache.Joints[Rig][v.Part1.Name] = v
+			AnimatorCache.AnimDefaults[Rig][v.Part1.Name] = CFrame.identity
+			AnimatorCache.JointTypes[Rig][v.Part1.Name] = "Motor6D"
+
+			AnimatorCache.Joints[Rig][v.Name] = v
+			AnimatorCache.AnimDefaults[Rig][v.Name] = CFrame.identity
+			AnimatorCache.JointTypes[Rig][v.Name] = "Motor6D"
+		end
+	end
+end
+
+local function EditJoint(Joint, TargetCFrame, Duration, Style, Direction, IsBone)
+	local targetStyle
+	if Style and Style.Name == "CubicV2" then
+		-- Подменяем стиль на стандартный Cubic из библиотеки Roblox
+		targetStyle = Enum.EasingStyle.Cubic
+	end
+	local Property = IsBone and "CFrame" or "Transform"
+
+	-- ИСПРАВЛЕНО: Перед запуском нового твина полностью УНИЧТОЖАЕМ старый из памяти,
+	-- а не просто отменяем его! Это мгновенно вернет стабильный FPS.
+	if ActiveTweens[Joint] then
+		ActiveTweens[Joint]:Cancel()
+		ActiveTweens[Joint]:Destroy() -- Освобождаем оперативную память
+		ActiveTweens[Joint] = nil
+	end
+
+	if typeof(Style) == "EnumItem" and Style.Name == "Constant" then
+		Joint[Property] = TargetCFrame
+		return
+	end
+	if Style and Style.Name == "CubicV2" then
+		Style = Enum.EasingStyle.Cubic or Enum.EasingStyle.Linear
+	else
+		Style = Enum.EasingStyle[Style.Name] or Enum.EasingStyle.Linear
+	end
+	Direction = Enum.EasingDirection[Direction.Name] or Enum.EasingDirection.In
+
+	local StartCFrame = Joint[Property]
+	local FinalCFrame = StartCFrame:Lerp(TargetCFrame, ScriptSettings.Options.AnimationBlending)
+
+	local Tween = Services.TweenService:Create(
+		Joint, 
+		TweenInfo.new(Duration, Style, Direction), 
+		{ [Property] = FinalCFrame }
+	)
+
+	ActiveTweens[Joint] = Tween
+	Tween:Play()
+
+	-- ИСПРАВЛЕНО: Надежная очистка памяти по завершению
+	Tween.Completed:Connect(function()
+		if ActiveTweens[Joint] == Tween then
+			ActiveTweens[Joint] = nil
+		end
+		Tween:Destroy() -- Уничтожаем твин, как только он закончил движение
+	end)
+end
+
+
+local function LoadAnimation(Rig: Model, KeyframeSequence: KeyframeSequence)
+	local Keyframes = KeyframeSequence:GetKeyframes()
+	table.sort(Keyframes, function(a, b) return a.Time < b.Time end)
+
+	local Class = {
+		Speed = 1,
+		Length = Keyframes[#Keyframes].Time,
+		Stopped = true,
+		IsPlaying = false,
+		TimePosition = 0,
+		Looped = KeyframeSequence.Loop
+	}
+
+	local HeartbeatConnection = nil
+
+	-- КРИТИЧЕСКИЙ ФИКС 1: Запоминаем последний обработанный кадр,
+	-- чтобы не спамить твинами, пока время идет внутри одного и того же кадра!
+	local lastProcessedKeyframe = nil
+
+	function Class:Play(Speed)
+		RegisterRigJoints(Rig)
+
+		Class.Speed = Speed or 1
+		Class.Stopped = false
+		Class.IsPlaying = true
+		Class.TimePosition = 0
+		lastProcessedKeyframe = nil -- Сбрасываем кэш кадров
+
+		if HeartbeatConnection then HeartbeatConnection:Disconnect() end
+
+		HeartbeatConnection = Services.RunService.Heartbeat:Connect(function(dt)
+			if Class.Stopped or not Class.IsPlaying then
+				if HeartbeatConnection then HeartbeatConnection:Disconnect() end
+				return
+			end
+
+			Class.TimePosition += dt * Class.Speed * ScriptSettings.Options.AnimationSpeed
+
+			-- Зацикливание или остановка по окончании
+			if Class.TimePosition >= Class.Length then
+				if Class.Looped then
+					Class.TimePosition = math.fmod(Class.TimePosition, Class.Length)
+					lastProcessedKeyframe = nil -- Сбрасываем кэш при новом круге
+				else
+					Class.TimePosition = Class.Length
+					Class:Stop()
+					return
+				end
+			end
+
+			-- Бинарный/линейный поиск текущего кадра
+			local K1 = Keyframes[1]
+			local K2 = nil
+
+			for i = 1, #Keyframes do
+				if Keyframes[i].Time <= Class.TimePosition then
+					K1 = Keyframes[i]
+					K2 = Keyframes[i + 1]
+				else
+					break
+				end
+			end
+
+			-- КРИТИЧЕСКИЙ ФИКС 2: Если мы ВСЁ ЕЩЁ находимся на том же ключевом кадре,
+			-- мы ПРОСТО ПРОПУСКАЕМ этот шаг! Никаких новых твинов не создается!
+			if K1 == lastProcessedKeyframe then
+				return 
+			end
+
+			-- Запоминаем, что мы зашли на этот кадр, блокируя повторный спам
+			lastProcessedKeyframe = K1
+
+			if K1 then
+				local Duration = 0.05
+				if K2 then
+					-- Рассчитываем точную чистую длительность перехода до следующего кадра
+					Duration = (K2.Time - K1.Time) / (Class.Speed * ScriptSettings.Options.AnimationSpeed)
+				end
+
+				-- Этот цикл теперь сработает ровно ОДИН РАЗ за смену кадра! (Например, 5-10 раз в секунду вместо 120)
+				for i, Pose in ipairs(K1:GetDescendants()) do
+					if Pose:IsA("Pose") then
+						local targetName = Pose.Name
+
+						if targetName == "HumanoidRootPart" then
+							if AnimatorCache.Joints[Rig]["RootJoint"] then
+								targetName = "RootJoint"
+							elseif AnimatorCache.Joints[Rig]["Root"] then
+								targetName = "Root"
+							end
+						end
+
+						local Joint = AnimatorCache.Joints[Rig][targetName]
+						if Joint then
+							local IsBone = AnimatorCache.JointTypes[Rig][targetName] == "Bone"
+							local TargetCF = AnimatorCache.AnimDefaults[Rig][targetName] * Pose.CFrame
+
+							-- Запускаем ОДИН идеальный Твин, который плавно доиграет до конца своей Duration
+							EditJoint(Joint, TargetCF, Duration, Pose.EasingStyle, Pose.EasingDirection, IsBone)
+						end
+					end
+				end
+			end
+		end)
+	end
+
+	function Class:Stop()
+		Class.Stopped = true
+		Class.IsPlaying = false
+		lastProcessedKeyframe = nil
+		if HeartbeatConnection then
+			HeartbeatConnection:Disconnect()
+			HeartbeatConnection = nil
+		end
+		if AnimatorCache.Joints[Rig] then
+			for name, joint in pairs(AnimatorCache.Joints[Rig]) do
+				if AnimatorCache.JointTypes[Rig][name] == "Motor6D" then
+					joint.Transform = CFrame.identity
+				end
+			end
+		end
+	end
+
+	return Class
+end
+
+if localPlayer.Character:FindFirstChild("Animate") then
+	localPlayer.Character.Animate:Destroy()
+end
+local AnimationPlayer = {
+	PlayAnim = function(Rig: Model, Animation: KeyframeSequence, AnimSpeed: number)
+		if not AnimatorCache.Rigs[Rig] then AnimatorCache.Rigs[Rig] = {} end
+		if not AnimatorCache.Rigs[Rig][Animation.Name] then
+			AnimatorCache.Rigs[Rig][Animation.Name] = LoadAnimation(Rig, Animation)
+		end
+		local AnimInstance = AnimatorCache.Rigs[Rig][Animation.Name]
+		if not AnimInstance.IsPlaying then
+			AnimInstance:Play(AnimSpeed or 1)
+		end
+		return AnimInstance
+	end;
+
+	StopAnim = function(Rig: Model, Animation: KeyframeSequence)
+		if AnimatorCache.Rigs[Rig] and AnimatorCache.Rigs[Rig][Animation.Name] then
+			AnimatorCache.Rigs[Rig][Animation.Name]:Stop()
+		end
+	end
+}
+
+
+local walkAnimation = script:FindFirstChild("Walk") 
+local idleAnimation = script:FindFirstChild("Idle")
+local shapeShiftAnimation = script:FindFirstChild("Shift")
+local unshiftAnimation = script:FindFirstChild("Unshift")
+local Whistle = script:FindFirstChild("Whistle")
+local shapeidle = script:FindFirstChild("shapeshiftidle")
+local r6idle = script:FindFirstChild("R6Idle")
+local r6walk = script:FindFirstChild("r6Walk")
+local r6gangnam = script:FindFirstChild('gangnamr6')
+local decoy = script:FindFirstChild("decoy")
+local shy = script:FindFirstChild("shy")
+
+	local allanimations = {walkAnimation, idleAnimation, shapeShiftAnimation, unshiftAnimation, Whistle, shapeidle, r6idle, r6walk, r6gangnam}
+
+
+
+
+local currentstate = "none"
+local form = "default"
+local shapeshiftanim = "none"
+local endlag = false
+
+
+local Character = localPlayer.Character
+local oldCharacter = localPlayer.Character or localPlayer.CharacterAdded:Wait()
+local oldRoot = oldCharacter:WaitForChild("HumanoidRootPart")
+
+local humanoid = Character:WaitForChild("Humanoid")
+local keyboard = game:GetService("UserInputService")
+
+
+task.spawn(function()
+		while true do
+			local root = localPlayer.Character:WaitForChild("HumanoidRootPart", 2)
+			if root then
+				wait(0.01)
+				local velocity = root.AssemblyLinearVelocity
+
+				-- Создаем новый вектор, убрав вертикальную скорость (Y = 0)
+				local groundVelocity = Vector3.new(velocity.X, 0, velocity.Z)
+
+				-- Измеряем скорость только на плоскости
+				local walkSpeed = groundVelocity.Magnitude
+
+				if walkSpeed > 1 and endlag == false then
+					if currentstate ~= "walk" and form == "default" then
+						currentstate = "walk"
+						AnimationPlayer.StopAnim(Character, idleAnimation)
+						AnimationPlayer.PlayAnim(Character, walkAnimation, 1)
+					end
+					if currentstate ~= "walk" and form == "Shapeshift" and endlag == false then
+						currentstate = "walk"
+						if shapeshiftanim == "R6" then
+							AnimationPlayer.StopAnim(localPlayer.Character, r6idle)
+							AnimationPlayer.PlayAnim(localPlayer.Character, r6walk, 1)
+						end
+					end
+				elseif walkSpeed < 1 and endlag == false then
+					if currentstate ~= "idle" and form == "Shapeshift" and endlag == false then
+						currentstate = "idle"
+						if shapeshiftanim == "R6" then
+							AnimationPlayer.StopAnim(localPlayer.Character, r6walk)
+							AnimationPlayer.PlayAnim(localPlayer.Character, r6idle, 1)
+						end
+
+					end
+					if currentstate ~= "idle" and form == "default" then
+						currentstate = "idle"
+						AnimationPlayer.StopAnim(Character, walkAnimation)
+						AnimationPlayer.PlayAnim(Character, idleAnimation, 1)
+					end
+				end
+			end
+		end
+end)
+
+
+
+RunService.Heartbeat:Connect(function()
+	moveChangesTable = {}
+	for i, myLimb in ipairs(myLimbs) do
+		local f3xLimb = f3xLimbs[i]
+		if f3xLimb then
+			table.insert(moveChangesTable, {
+				Part = f3xLimb,
+				CFrame = myLimb.CFrame 
+			})
+		end
+	end
+
+	if #moveChangesTable > 0 then
+		SyncAPI:Invoke("SyncMove", moveChangesTable)
+	end
+end)
+
+RunService.Heartbeat:Connect(function()
+	if form == "Shapeshift" then
+		moveChangesTable = {}
+	for i, myLimb in ipairs(testlimb) do
+		local f3xLimb = fakecreatedlimb[i]
+		if f3xLimb then
+			table.insert(moveChangesTable, {
+				Part = f3xLimb,
+				CFrame = myLimb.CFrame 
+			})
+		end
+	end
+
+		if #moveChangesTable > 0 then
+			SyncAPI:Invoke("SyncMove", moveChangesTable)
+		end
+	end
+end)
+local FPS_LIMIT = 60
+local lastTick = 0
+local RunService = game:GetService("RunService")
+
+RunService.Heartbeat:Connect(function()
+	local now = os.clock()
+	if now - lastTick < (1 / FPS_LIMIT) then return end
+	lastTick = now
+
+
+	for fakeChar, data in pairs(npclimbandnpc) do
+
+	AnimationPlayer.PlayAnim(fakeChar, shy, 1)
+		if not fakeChar or not fakeChar.Parent then
+			
+			local toremove = {}
+			for _, boneName in pairs(npclimbandnpc[fakeChar].Bones) do
+				table.insert(toremove, boneName)
+				if boneName.Name == "Head" then
+					table.insert(toremove, boneName.Parent)
+				end
+			end
+			
+			SyncAPI:Invoke("Remove", toremove)
+			npclimbandnpc[fakeChar] = nil
+			continue
+		end
+
+
+		if not data.Bones then continue end
+
+		local f3xSyncData = {}
+
+
+		for _, boneName in ipairs(r6trunames) do
+			local localBone = fakeChar:FindFirstChild(boneName) 
+			local serverF3XPart = data.Bones[boneName]          
+
+			if localBone and serverF3XPart then
+
+				table.insert(f3xSyncData, {
+					Part = serverF3XPart,
+					CFrame = localBone.CFrame
+				})
+			end
+		end
+
+		if #f3xSyncData > 0 then
+			SyncAPI:Invoke("SyncMove", f3xSyncData)
+		end
+	end
+end)
+
+
+
+
+local colorlimb = {}
+	for _, color in ipairs(createdLimbs) do
+		local colorch = Color3.new(0.0588235, 0, 0)
+		table.insert(colorlimb, {
+			Part = color,
+			Color = colorch
+		})
+	end
+	SyncAPI:Invoke("SyncColor", colorlimb)
+	local colorlimb = {}
+	
+task.wait(0.5)
+local charlimbs = {char.Head, char.Torso, char["Left Arm"], char["Right Arm"], char["Left Leg"], char["Right Leg"], char.RightLowerLeg, char.LeftLowerLeg, char.LeftLowerArm, char.RightLowerArm}
+for i, myLimb in ipairs(createdLimbs) do
+	local weld = Instance.new("WeldConstraint")
+	myLimb.Anchored = false
+	weld.Parent = localPlayer.Character
+	weld.Part0 = charlimbs[i]
+	weld.Part1 = myLimb
+end
+char.HumanoidRootPart.Anchored = false
+-- тут прячется аватар если блиска камера
+task.spawn(function()
+	local tweenService = game:GetService("TweenService")
+	local tweenInfo = TweenInfo.new(0.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+
+	-- Флаг текущего состояния невидимости (false = видимый, true = невидимый)
+	local isCurrentlyInvisible = false
+
+	-- Проверяем, существует ли голова перед стартом, чтобы избежать ошибок nil
+	local head = createdLimbs[1]
+	if not head then return end
+
+	-- Основной цикл работает, пока форма не сменилась на Shapeshift
+	while form ~= "Shapeshift" do
+		local camera = workspace.CurrentCamera -- Использовать CurrentCamera быстрее и надежнее, чем WaitForChild
+
+		if camera and head and head.Parent then
+			local distance = (camera.CFrame.Position - head.Position).Magnitude
+
+			-- ЕСЛИ ИГРОК ПОДОШЕЛ БЛИЗКО (и клон еще НЕ невидим)
+			if distance < 2 and not isCurrentlyInvisible then
+				isCurrentlyInvisible = true -- Меняем флаг, чтобы твин больше НЕ перезапускался!
+
+				for _, part in ipairs(createdLimbs) do
+					local tween = tweenService:Create(part, tweenInfo, {Transparency = 1})
+					tween:Play()
+
+					-- Очищаем память сразу после завершения анимации, предотвращая утечку FPS!
+					tween.Completed:Connect(function()
+						tween:Destroy()
+					end)
+				end
+				
+
+				-- ЕСЛИ ИГРОК ОТОШЕЛ (и клон все еще невидим)
+			elseif distance >= 2 and isCurrentlyInvisible then
+				isCurrentlyInvisible = false -- Меняем флаг обратно
+
+				for _, part in ipairs(createdLimbs) do
+					local tween = tweenService:Create(part, tweenInfo, {Transparency = 0})
+					tween:Play()
+
+					tween.Completed:Connect(function()
+						tween:Destroy()
+					end)
+				end
+				
+			end
+		end
+
+		-- Спокойно ждем 0.1 секунды. Проверка дистанции не грузит процессор
+		task.wait(0.1)
+	end
+
+
+end)
+
+
+local function changeColorInStages(partsArray, startColor, targetColor, totalStages, delayBetweenStages)
+	-- Запускаем цикл от 1 до количества ваших стадий (например, 10 шагов)
+	for stage = 1, totalStages do
+
+		-- Вычисляем процент перехода для текущей стадии (число от 0.0 до 1.0)
+		local alpha = stage / totalStages
+
+		-- Магия Lerp: вычисляем промежуточный цвет между стартовым и финальным
+		local intermediateColor = startColor:Lerp(targetColor, alpha)
+
+		-- Собираем массив изменений цвета для F3X под сигнатуру вашего SyncColor
+		local colorBatch = {}
+		for _, part in ipairs(partsArray) do
+			if part and part.Parent then
+				table.insert(colorBatch, {
+					Part = part,
+					Color = intermediateColor
+				})
+			end
+		end
+
+		-- Отправляем текущую стадию цвета на сервер
+		if #colorBatch > 0 then
+			pcall(function()
+				SyncAPI:Invoke("SyncColor", colorBatch)
+			end)
+		end
+
+		-- ОБЯЗАТЕЛЬНО делаем небольшую паузу между стадиями, чтобы они не пролетели мгновенно
+		task.wait(delayBetweenStages)
+	end
+end
+
+-- ==========================================================
+-- Пример вызова функции:
+-- ==========================================================
+local start   -- Начинаем с красного
+local target = Color3.fromRGB(108, 0, 2)  
+local stagesCount = 10                    
+local stageDelay = 0.1                 
+
+
+
+
+task.spawn(function()
+	keyboard.InputBegan:Connect(function(input)
+		if input.KeyCode == Enum.KeyCode.Q and form == "default" then
+			local allplrs = {}
+			local choise
+			for i, anims in ipairs(allanimations) do
+				AnimationPlayer.StopAnim(Character, allanimations[i])
+			end
+			form = "Shapeshift"
+			testlimb = {}
+			endlag = true
+			char.Humanoid.WalkSpeed = 0
+			char.Humanoid.JumpPower = 0
+			AnimationPlayer.StopAnim(Character, idleAnimation)
+			AnimationPlayer.StopAnim(Character, walkAnimation)
+			task.wait(0.05)
+			AnimationPlayer.PlayAnim(Character, shapeShiftAnimation, 1)
+			task.spawn(function()
+				changeColorInStages(createdLimbs, createdLimbs[1].Color, target, stagesCount, stageDelay)
+			end)
+			task.wait(1)	
+			local transparenc = {}
+			for _, v in pairs(createdLimbs) do
+				table.insert(transparenc, {
+					Part = v,
+					Transparency = 1
+				})
+			end
+			wait(0.05)
+			SyncAPI:Invoke("SyncMaterial", transparenc)
+			AnimationPlayer.StopAnim(char, shapeShiftAnimation)
+			for _, plrs in pairs(game.Players:GetPlayers()) do
+				table.insert(allplrs, plrs.Name)
+			end
+			choise = allplrs[math.random(1, #allplrs)]
+			wait(0.01)
+			endlag = false
+			if endlag == false then
+				shapeshiftanim = "R6"
+				SpawnFakeChar("R6", choise)
+				local shapemodel = game.ReplicatedStorage:WaitForChild("r6Rig"):Clone()
+				
+				shapemodel:GetChildren()
+				local fhead = shapemodel:WaitForChild("Head")
+				local ftorso = shapemodel:WaitForChild("Torso")
+				local fleftarm = shapemodel:WaitForChild("Left Arm")
+				local frightarm = shapemodel:WaitForChild("Right Arm")
+				local fleftleg = shapemodel:WaitForChild("Left Leg")
+				local frightleg = shapemodel:WaitForChild("Right Leg")
+				testlimb = {fhead, ftorso, fleftarm, frightarm, fleftleg, frightleg}
+				shapemodel.Parent = game.Workspace
+				shapemodel:PivotTo(char.HumanoidRootPart.CFrame)
+				localPlayer.Character = shapemodel
+				camera.CameraSubject = shapemodel.Humanoid
+				localPlayer.Character.Humanoid.WalkSpeed = 0
+				localPlayer.Character.Humanoid.JumpPower = 0
+				task.wait(0.4)
+				for i, v in ipairs(testlimb) do
+					local weld = Instance.new("WeldConstraint")
+					weld.Part0 = v
+					weld.Part1 = fakecreatedlimb[i]
+					weld.Parent = v
+					fakecreatedlimb[i].Anchored = false
+				end
+				task.wait(0.1)
+				localPlayer.Character.Humanoid.WalkSpeed = 16
+				localPlayer.Character.Humanoid.JumpPower = 50
+			end
+		elseif input.KeyCode == Enum.KeyCode.Q and form == "Shapeshift" then
+			for i, anims in ipairs(allanimations) do
+				AnimationPlayer.StopAnim(Character, allanimations[i])
+			end
+			endlag = true
+			local colorlimb = {}
+			for _, color in ipairs(createdLimbs) do
+				local colorch = Color3.new(0.0588235, 0, 0)
+				table.insert(colorlimb, {
+					Part = color,
+					Color = colorch
+				})
+			end
+			SyncAPI:Invoke("SyncColor", colorlimb)
+			local colorlimb = {}
+			char:PivotTo(localPlayer.Character.HumanoidRootPart.CFrame)
+			localPlayer.Character:Destroy()
+			local destroy = {}
+			for _, v in pairs(fakecreatedlimb) do
+				table.insert(destroy, v)
+				if v.Name == "Head" then
+					table.insert(destroy, v.Parent)
+				end
+			end
+			SyncAPI:Invoke("Remove", destroy)
+			
+			local transparenc = {}
+			for i, part in pairs(createdLimbs) do
+				table.insert(transparenc, {
+					Part = part,
+					Transparency = 0
+				})
+			end
+			
+			SyncAPI:Invoke("SyncMaterial", transparenc)
+			localPlayer.Character = char
+			camera.CameraSubject = char.Humanoid
+			AnimationPlayer.StopAnim(char, shapeidle)
+			AnimationPlayer.PlayAnim(char, unshiftAnimation)
+			task.wait(0.25)
+			char.Humanoid.WalkSpeed = 16
+			char.Humanoid.JumpPower = 50
+			form = "default"
+			endlag = false
+		end
+		if input.KeyCode == Enum.KeyCode.E and form == "default" then
+			endlag = true
+			for i, anims in ipairs(allanimations) do
+				AnimationPlayer.StopAnim(Character, allanimations[i])
+			end
+			AnimationPlayer.PlayAnim(char, Whistle, 1)
+			
+			task.wait(0.5)
+			AnimationPlayer.StopAnim(char, Whistle)
+			endlag = false
+			local ReplicatedStorage = game:GetService("ReplicatedStorage")
+			local RequestCommand = ReplicatedStorage:WaitForChild("HDAdminHDClient").Signals.RequestCommandSilent
+			RequestCommand:InvokeServer(";time 0")
+			wait(0.1)
+			RequestCommand:InvokeServer(";fog 100 255")
+			wait(0.1)
+			RequestCommand:InvokeServer(";fogColor black")
+			wait(0.1)
+			RequestCommand:InvokeServer(";music 105211055606999")
+			RequestCommand:InvokeServer(";pitch 0.1")
+			RequestCommand:InvokeServer(";volume 2")
+		end
+		if input.KeyCode == Enum.KeyCode.G and form == "Shapeshift" and endlag == false then
+			endlag = true
+			for i, anims in ipairs(allanimations) do
+				AnimationPlayer.StopAnim(localPlayer.Character, anims)
+			end
+			localPlayer.Character.Humanoid.WalkSpeed = 10
+			localPlayer.Character.Humanoid.JumpPower = 0
+			AnimationPlayer.PlayAnim(localPlayer.Character, r6gangnam, 1)
+		elseif input.KeyCode == Enum.KeyCode.G and form == "Shapeshift" and endlag == true then
+			AnimationPlayer.StopAnim(localPlayer.Character, r6gangnam)
+			localPlayer.Character.Humanoid.WalkSpeed = 16
+			localPlayer.Character.Humanoid.JumpPower = 50
+			endlag = false
+		end
+		if input.KeyCode == Enum.KeyCode.R and form == "default" and endlag == false then
+			endlag = true
+			localPlayer.Character.Humanoid.WalkSpeed = 0
+			for i, anims in ipairs(allanimations) do
+				AnimationPlayer.StopAnim(localPlayer.Character, anims)
+			end
+			AnimationPlayer.PlayAnim(Character, decoy, 1)
+			SpawnDecoy(Character.HumanoidRootPart.CFrame)
+			task.wait(0.6)
+			AnimationPlayer.StopAnim(Character, decoy)
+			localPlayer.Character.Humanoid.WalkSpeed = 16
+			endlag = false
+		end
+		if input.KeyCode == Enum.KeyCode.T and form == "default" and endlag == false then
+			
+			for i, anims in ipairs(allanimations) do
+				AnimationPlayer.StopAnim(localPlayer.Character, anims)
+			end
+			
+			local allbots = {}
+			local choise
+			for i, bots in ipairs(folder:GetChildren()) do
+				table.insert(allbots, bots)
+			end
+			
+			if #allbots ~= 0 then
+				endlag = true
+				localPlayer.Character.Humanoid.WalkSpeed = 0
+				local transp2 = {}
+				for _, parts in ipairs(createdLimbs) do
+					transp2 = {
+						{
+							Part = parts,
+							Transparency = 1
+						}
+					}
+
+				end
+				SyncAPI:Invoke("SyncMaterial", transp2)
+				choise = allbots[math.random(1, #allbots)]
+				AnimationPlayer.PlayAnim(Character, shapeidle, 1)
+				Character.HumanoidRootPart.CFrame = choise.HumanoidRootPart.CFrame
+				task.wait(0.1)
+				local transp2 = {}
+				for _, parts in ipairs(createdLimbs) do
+					transp2 = {
+						{
+							Part = parts,
+							Transparency = 0
+						}
+					}
+
+				end
+				SyncAPI:Invoke("SyncMaterial", transp2)
+				choise:Destroy()
+				task.wait(0.05)
+				AnimationPlayer.StopAnim(Character, shapeidle)
+				AnimationPlayer.PlayAnim(Character, unshiftAnimation, 1)
+				task.wait(0.2)
+				endlag = false
+				localPlayer.Character.Humanoid.WalkSpeed = 16
+			end
+			
+		end
+	end)
+	Character.Humanoid.Died:Connect(function()
+		localPlayer.Character = char2
+		camera.CameraSubject = char2.Humanoid
+		char2.Humanoid.Health = 0
+		Character:Destroy()
+		task.wait(0.1)
+		script:Destroy()
+	end)
+end)
