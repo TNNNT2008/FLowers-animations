@@ -1,11 +1,14 @@
 local model2 = game:GetObjects("rbxassetid://76466365970162")[1]
 for _, child in model2:GetChildren() do
-	child.Parent = script
-end
-local model = game:GetObjects("rbxassetid://90833713196351")[1]
-for _, child in model:GetChildren() do
 	child.Parent = game.ReplicatedStorage
 end
+if not game.ReplicatedStorage:FindFirstChild("Rig2") then
+	local model = game:GetObjects("rbxassetid://90833713196351")[1]
+	for _, child in model:GetChildren() do
+		child.Parent = game.ReplicatedStorage
+	end
+end
+
 
 
 local localPlayer = game.Players.LocalPlayer
@@ -671,17 +674,17 @@ local AnimationPlayer = {
 }
 
 
-local walkAnimation = script:FindFirstChild("Walk") 
-local idleAnimation = script:FindFirstChild("Idle")
-local shapeShiftAnimation = script:FindFirstChild("Shift")
-local unshiftAnimation = script:FindFirstChild("Unshift")
-local Whistle = script:FindFirstChild("Whistle")
-local shapeidle = script:FindFirstChild("shapeshiftidle")
-local r6idle = script:FindFirstChild("R6Idle")
-local r6walk = script:FindFirstChild("r6Walk")
-local r6gangnam = script:FindFirstChild('gangnamr6')
-local decoy = script:FindFirstChild("decoy")
-local shy = script:FindFirstChild("shy")
+local walkAnimation = game.ReplicatedStorage:FindFirstChild("Walk") 
+local idleAnimation = game.ReplicatedStorage:FindFirstChild("Idle")
+local shapeShiftAnimation = game.ReplicatedStorage:FindFirstChild("Shift")
+local unshiftAnimation = game.ReplicatedStorage:FindFirstChild("Unshift")
+local Whistle = game.ReplicatedStorage:FindFirstChild("Whistle")
+local shapeidle = game.ReplicatedStorage:FindFirstChild("shapeshiftidle")
+local r6idle = game.ReplicatedStorage:FindFirstChild("R6Idle")
+local r6walk = game.ReplicatedStorage:FindFirstChild("r6Walk")
+local r6gangnam = game.ReplicatedStorage:FindFirstChild('gangnamr6')
+local decoy = game.ReplicatedStorage:FindFirstChild("decoy")
+local shy = game.ReplicatedStorage:FindFirstChild("shy")
 
 	local allanimations = {walkAnimation, idleAnimation, shapeShiftAnimation, unshiftAnimation, Whistle, shapeidle, r6idle, r6walk, r6gangnam}
 
