@@ -476,50 +476,73 @@ local function RegisterRigJoints(Rig: Model)
 end
 
 local function EditJoint(Joint, TargetCFrame, Duration, Style, Direction, IsBone)
-	local targetStyle
-	if Style and Style.Name == "CubicV2" then
-		-- Подменяем стиль на стандартный Cubic из библиотеки Roblox
-		targetStyle = Enum.EasingStyle.Cubic
+	-- Фикс: Если сустав был удален из игры в процессе (например, очистка F3X), мгновенно выходим
+	if not Joint or not Joint.Parent then return end
+
+	-- 1. БЕЗОПАСНАЯ ПОДМЕНА СТИЛЯ (Создаем локальную переменную, чтобы не ломать Enum)
+	local targetStyle = Enum.EasingStyle.Linear
+	if Style then
+		if Style.Name == "CubicV2" or Style.Name == "Cubic" then
+			targetStyle = Enum.EasingStyle.Cubic
+		else
+			-- Используем pcall на случай, если прилетит совсем неизвестный стиль
+			pcall(function()
+				targetStyle = Enum.EasingStyle[Style.Name]
+			end)
+		end
 	end
+
 	local Property = IsBone and "CFrame" or "Transform"
 
-	-- ИСПРАВЛЕНО: Перед запуском нового твина полностью УНИЧТОЖАЕМ старый из памяти,
-	-- а не просто отменяем его! Это мгновенно вернет стабильный FPS.
-	if ActiveTweens[Joint] then
-		ActiveTweens[Joint]:Cancel()
-		ActiveTweens[Joint]:Destroy() -- Освобождаем оперативную память
-		ActiveTweens[Joint] = nil
+	-- 2. ИСПРАВЛЕНИЕ: Безопасное уничтожение старого твина с защитой от пинга
+	local oldTween = ActiveTweens[Joint]
+	if oldTween then
+		ActiveTweens[Joint] = nil -- Мгновенно стираем ссылку из таблицы, чтобы избежать дублирования
+		
+		pcall(function()
+			-- Проверяем, жив ли еще объект в памяти Roblox
+			if typeof(oldTween) == "Instance" then
+				oldTween:Cancel()
+				oldTween:Destroy() -- Безопасно уничтожаем. pcall проглотит ошибку, если он уже был удален в Completed
+			end
+		end)
 	end
 
-	if typeof(Style) == "EnumItem" and Style.Name == "Constant" then
+	-- Обработка стиля Constant (мгновенный переход без твина)
+	if Style and Style.Name == "Constant" then
 		Joint[Property] = TargetCFrame
 		return
 	end
-	if Style and Style.Name == "CubicV2" then
-		Style = Enum.EasingStyle.Cubic or Enum.EasingStyle.Linear
-	else
-		Style = Enum.EasingStyle[Style.Name] or Enum.EasingStyle.Linear
+
+	-- Безопасный выбор направления сглаживания
+	local targetDirection = Enum.EasingDirection.In
+	if Direction then
+		pcall(function()
+			targetDirection = Enum.EasingDirection[Direction.Name]
+		end)
 	end
-	Direction = Enum.EasingDirection[Direction.Name] or Enum.EasingDirection.In
 
 	local StartCFrame = Joint[Property]
 	local FinalCFrame = StartCFrame:Lerp(TargetCFrame, ScriptSettings.Options.AnimationBlending)
 
+	-- Создаем новый твин, используя НАШИ подготовленные и безопасные targetStyle и targetDirection
 	local Tween = Services.TweenService:Create(
 		Joint, 
-		TweenInfo.new(Duration, Style, Direction), 
+		TweenInfo.new(Duration, targetStyle, targetDirection), 
 		{ [Property] = FinalCFrame }
 	)
 
 	ActiveTweens[Joint] = Tween
 	Tween:Play()
 
-	-- ИСПРАВЛЕНО: Надежная очистка памяти по завершению
+	-- Надежная очистка памяти по завершению
 	Tween.Completed:Connect(function()
 		if ActiveTweens[Joint] == Tween then
 			ActiveTweens[Joint] = nil
 		end
-		Tween:Destroy() -- Уничтожаем твин, как только он закончил движение
+		pcall(function()
+			Tween:Destroy() -- Защищаем финальное удаление от конфликтов с новыми кадрами
+		end)
 	end)
 end
 
