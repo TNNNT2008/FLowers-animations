@@ -282,7 +282,7 @@ local function SpawnDecoy(pos)
 	local colors = {}
 	
 	for i, limb in ipairs(r6names) do
-		local newPart = SyncAPI:Invoke('CreatePart', "Normal", workspace.SpawnLocation.CFrame, workspace)
+		local newPart = SyncAPI:Invoke('CreatePart', "Normal", localPlayer.Character.HumanoidRootPart.CFrame, workspace)
 		table.insert(fakelimbs, newPart)
 		table.insert(size, {
 			Part = newPart,
@@ -373,7 +373,7 @@ local function SpawnFakeChar(Rig, plr)
 	
 	if Rig == "R6" then
 		for i, limb in ipairs(r6names) do
-			local newPart = SyncAPI:Invoke('CreatePart', "Normal", workspace.SpawnLocation.CFrame, workspace)
+			local newPart = SyncAPI:Invoke('CreatePart', "Normal", localPlayer.Character.HumanoidRootPart.CFrame, workspace)
 			table.insert(fakecreatedlimb, newPart)
 			table.insert(size, {
 				Part = newPart,
