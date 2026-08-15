@@ -2,12 +2,12 @@ local model2 = game:GetObjects("rbxassetid://76466365970162")[1]
 for _, child in model2:GetChildren() do
 	child.Parent = game.ReplicatedStorage
 end
-if not game.ReplicatedStorage:FindFirstChild("Rig2") then
+
 	local model = game:GetObjects("rbxassetid://90833713196351")[1]
 	for _, child in model:GetChildren() do
 		child.Parent = game.ReplicatedStorage
 	end
-end
+
 
 
 
